@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "69347039922",
+    "project_id": "exam-collector-app",
+    "storage_bucket": "exam-collector-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69347039922:android:000fe339c7e398a83987ab",
+        "android_client_info": {
+          "package_name": "com.example.exam_collector"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvqHBLbvy6jqrkiIF6rxtLn8wqV4v0SLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
