@@ -43,7 +43,7 @@ class _AddScheduleState extends State<AddSchedule> {
 
   Future<void> saveNote() async {
     if (title != null) {
-      await fetchingExams().postNotes(
+      await fetchingExams().postNote(
         userEmail: userModels?.userEmail ?? '',
         userNote: _controller.text,
         title: title!,

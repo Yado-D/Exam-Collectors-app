@@ -20,7 +20,7 @@ class calculatorUi extends StatefulWidget {
 }
 
 class _calculatorUiState extends State<calculatorUi> {
-  List<CourseModule> myCourses = [];
+  List<CourseModule>? myCourses = [];
   String courseName = '';
   int crdHour = 0;
   double grade = 0.0;
@@ -198,37 +198,71 @@ class _calculatorUiState extends State<calculatorUi> {
                       TextFontWeight: FontWeight.w600,
                     ),
                   ),
-                if (allMyCourses?.length != 0 && allMyCourses != null)
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: allMyCourses.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: EdgeInsets.only(
-                            top: 15, bottom: 0, right: 15, left: 15),
-                        child: commonSubjectContainer(
-                          course: allMyCourses[index],
-                          editPressed: (value) async {
-                            // Handle selection
-                            print('Selected: $value');
-                            setState(() {
-                              allMyCourses[index].grade = double.parse(value!);
-                            });
-                            await Global.storageServices
-                                .addGradeCourses(allMyCourses);
-                          },
-                          deletePressed: () async {
-                            setState(() {
-                              allMyCourses.removeAt(index);
-                            });
-                            await Global.storageServices
-                                .addGradeCourses(allMyCourses);
-                          },
-                        ),
-                      );
-                    },
-                  ),
+                myCourses?.length != 0 && myCourses != null
+                    ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: myCourses?.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: EdgeInsets.only(
+                                top: 15, bottom: 0, right: 15, left: 15),
+                            child: commonSubjectContainer(
+                              course: myCourses![index],
+                              editPressed: (value) async {
+                                // Handle selection
+                                print('Selected: $value');
+                                setState(() {
+                                  myCourses![index].grade =
+                                      double.parse(value!);
+                                });
+                                await Global.storageServices
+                                    .addGradeCourses(myCourses!);
+                              },
+                              deletePressed: () async {
+                                setState(() {
+                                  myCourses!.removeAt(index);
+                                });
+                                await Global.storageServices
+                                    .addGradeCourses(myCourses!);
+                              },
+                            ),
+                          );
+                        },
+                      )
+                    : (allMyCourses?.length != 0 && allMyCourses != null)
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: allMyCourses.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: EdgeInsets.only(
+                                    top: 15, bottom: 0, right: 15, left: 15),
+                                child: commonSubjectContainer(
+                                  course: allMyCourses[index],
+                                  editPressed: (value) async {
+                                    // Handle selection
+                                    print('Selected: $value');
+                                    setState(() {
+                                      allMyCourses[index].grade =
+                                          double.parse(value!);
+                                    });
+                                    await Global.storageServices
+                                        .addGradeCourses(allMyCourses);
+                                  },
+                                  deletePressed: () async {
+                                    setState(() {
+                                      allMyCourses.removeAt(index);
+                                    });
+                                    await Global.storageServices
+                                        .addGradeCourses(allMyCourses);
+                                  },
+                                ),
+                              );
+                            },
+                          )
+                        : SizedBox(),
                 Container(
                   padding: EdgeInsets.all(15),
                   margin: EdgeInsets.all(15),
@@ -358,10 +392,11 @@ class _calculatorUiState extends State<calculatorUi> {
                             print(courseModel.toString());
 
                             setState(() {
-                              myCourses.add(courseModel);
+                              myCourses = allMyCourses;
+                              myCourses?.add(courseModel);
                             });
 
-                            Global.storageServices.addGradeCourses(myCourses);
+                            Global.storageServices.addGradeCourses(myCourses!);
 
                             commonSnackBar(
                                 context,

@@ -1,6 +1,7 @@
 
 import 'package:examcollectors/Common/pages.dart';
 import 'package:examcollectors/global.dart';
+import 'package:examcollectors/services/examProvider.dart';
 import 'package:examcollectors/services/pomodoro_study_provider.dart';
 import 'package:examcollectors/services/theme_mode_provider.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => ThemeManager()),
           ChangeNotifierProvider(create: (_) => PomodoroTimerService()),
+          ChangeNotifierProvider(create: (_) => ExamTimerProvider()),
+
         ],
         builder: (context,child){
           return  ScreenUtilInit(

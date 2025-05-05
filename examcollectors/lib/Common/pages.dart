@@ -1,5 +1,7 @@
 import 'package:examcollectors/Common/name.dart';
 import 'package:examcollectors/Models/UserModels.dart';
+import 'package:examcollectors/Pages/ExamPage/Bloc/exam_bloc.dart';
+import 'package:examcollectors/Pages/ExamPage/pages/exam_page.dart';
 import 'package:examcollectors/Pages/ExamStartedPage/pages/exam_started_page.dart';
 
 import 'package:examcollectors/Pages/HomePage/blocs/homePageBloc.dart';
@@ -100,16 +102,16 @@ class NamedRouteSettings {
           create: (_) => HomePageBloc(),
         ),
       ),
-      // pageEntity(
-      //   route: NamedRoutes.EXAM_STARTING_PAGE,
-      //   page: exam_starting_page(),
-      //   // bloc: BlocProvider(
-      //   //   create: (_) => HomePageBloc(),
-      //   // ),
-      // ),
+      pageEntity(
+        route: NamedRoutes.EXAM_PAGE,
+        page: exam_page(),
+        bloc: BlocProvider(
+          create: (_) => ExamBloc(),
+        ),
+      ),
       pageEntity(
         route: NamedRoutes.EXAM_STARTED_PAGE,
-        page: const exam_started_page(),
+        page:  ExamStartedPage(),
         // bloc: BlocProvider(
         //   create: (_) => HomePageBloc(),
         // ),

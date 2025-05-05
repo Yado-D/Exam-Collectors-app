@@ -32,7 +32,7 @@ class _AskTeacherState extends State<AskTeacher> {
                         onTap: () {},
                         child: Image.asset(
                           "assets/icons/teacherImage.png",
-                          color: ColorCollections.WhiteColor,
+                          color: ColorCollections.TextColor,
                         ),
                       ),
                     ),

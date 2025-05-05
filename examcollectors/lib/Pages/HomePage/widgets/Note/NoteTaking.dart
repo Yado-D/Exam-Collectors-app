@@ -1,7 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:examcollectors/Pages/HomePage/widgets/Note/seeNotes.dart';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +9,7 @@ import '../../../../utils/AppColorCollections.dart';
 import '../../../../utils/constants.dart';
 import '../../../../widgets/AllCommonWidget.dart';
 import 'addNote.dart';
+import 'seeNotes.dart';
 
 class classSchedule extends StatefulWidget {
   const classSchedule({super.key});
@@ -21,40 +19,56 @@ class classSchedule extends StatefulWidget {
 }
 
 class _classScheduleState extends State<classSchedule> {
-  Map<String, dynamic> userNotes = {};
   String userEmail = '';
   UserModels? userData;
+  List<Map<String, dynamic>> notes = [];
 
   @override
   void initState() {
     super.initState();
-    getNotes(); // Fetch notes during initialization
+    _loadUserData();
+    setState(() {});
   }
 
-  Future<void> getNotes() async {
+  Future<void> _loadUserData() async {
     try {
       userData = await Global.storageServices.getData(AppConstants.USERDATA);
       if (userData != null) {
         setState(() {
           userEmail = userData!.userEmail ?? '';
         });
-      } else {
-        print('User data is null');
+        _fetchNotes();
       }
     } catch (e) {
       print('Error fetching user data: $e');
     }
   }
 
-  String formatTimestamp(Timestamp timestamp) {
+  Future<void> _fetchNotes() async {
     try {
-      DateTime dateTime = timestamp.toDate(); // Convert Timestamp to DateTime
-      String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(dateTime);
-      return formattedDate;
+      final result = await fetchingExams().GetPostNotes(userEmail: userEmail);
+      if (result.isNotEmpty) {
+        setState(() {
+          notes = List<Map<String, dynamic>>.from(result);
+        });
+      }
+    } catch (e) {
+      print('Error fetching notes: $e');
+    }
+  }
+
+  String _formatTimestamp(Timestamp timestamp) {
+    try {
+      return DateFormat('yyyy-MM-dd – kk:mm').format(timestamp.toDate());
     } catch (e) {
       print('Error formatting timestamp: $e');
       return "Invalid date";
     }
+  }
+
+  Future<void> onRefresh() async {
+    Future.delayed(Duration(seconds: 2));
+    setState(() {});
   }
 
   @override
@@ -62,122 +76,104 @@ class _classScheduleState extends State<classSchedule> {
     return Scaffold(
       backgroundColor: ColorCollections.PageColor,
       appBar: AppBar(
-        backgroundColor:ColorCollections.TextColor,
+        backgroundColor: ColorCollections.TextColor,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back, color: ColorCollections.WhiteColor),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
         title: ReusableText(
-          TextString: 'Note',
+          TextString: 'Notes',
           FontSize: 20,
-          TextColor: ColorCollections.WhiteColor,
+          TextColor: Colors.white,
           TextFontWeight: FontWeight.w500,
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: () async {
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddSchedule()),
-              ).then((value) {
-                if (value == true) {
-                  setState(() {
-                    // Trigger your refresh logic here
-                  });
-                }
-              });
+                MaterialPageRoute(builder: (context) => const AddSchedule()),
+              );
+              _fetchNotes(); // Refresh after adding new note
             },
-            icon: Icon(Icons.add, color: ColorCollections.WhiteColor),
           ),
         ],
       ),
-      body: userEmail.isEmpty
-          ? Center(child: CircularProgressIndicator())
-          : FutureBuilder(
-        future: fetchingExams().GetPostNotes(userEmail: userEmail),
-        builder: (context, snap) {
-          if (snap.hasError) {
-            return Center(
-              child: ReusableText(
-                TextString: 'Something went wrong please check your network',
-                FontSize: 16,
-                TextColor: Colors.red,
+      body: RefreshIndicator(
+        onRefresh: onRefresh,
+        child: _buildNotesList(),
+      ),
+    );
+  }
+
+  Widget _buildNotesList() {
+    if (userEmail.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (notes.isEmpty) {
+      return Center(
+        child: ReusableText(
+          TextString: 'No notes found!',
+          FontSize: 18,
+          TextColor: Colors.grey,
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: notes.length,
+      itemBuilder: (context, index) {
+        final note = notes[index];
+        return InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SeeSchedule(
+                noteId: note['id'],
+                userNotes: note['content'],
+                userEmail: userEmail,
               ),
-            );
-          } else if (snap.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snap.hasData || (snap.data as Map<String, dynamic>)['userNote'] == null) {
-            return Center(
-              child: ReusableText(
-                TextString: 'No notes found!',
-                FontSize: 18,
-                TextColor: Colors.grey,
-              ),
-            );
-          } else {
-            userNotes = snap.data as Map<String, dynamic>;
-            List<dynamic> notes = userNotes['userNote'];
-            print("has data");
-            return ListView.builder(
-              itemCount: userNotes['userNote'] != null ? userNotes['userNote'].length : 0,
-              itemBuilder: (context, index) {
-                var note = userNotes['userNote'][index]; // Fetch the note object
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => seeSchedule(
-                          userNotes: note,
-                          userEmail: userEmail,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    height: 70,
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/Images/note.png'),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ReusableText(
-                              TextFontWeight: FontWeight.w500,
-                              TextString: "${userNotes['Title'][index]}" ?? "", // Access Title
-                              FontSize: 18,
-                            ),
-                            SizedBox(height: 5),
-                            ReusableText(
-                              FromTop: 0,
-                              TextString:formatTimestamp(userNotes['Date'][index]), // Access Date
-                              FontSize: 16,
-                            ),
-                          ],
-                        ),
-                      ],
+            ),
+          ),
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            height: 70,
+            child: Row(
+              children: [
+                Container(
+                  height: 50,
+                  width: 50,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/Images/note.png'),
                     ),
                   ),
-                );
-              },
-            );
-          }
-        },
-      ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ReusableText(
+                        TextFontWeight: FontWeight.w500,
+                        TextString: note['title'] ?? "Untitled",
+                        FontSize: 18,
+                      ),
+                      ReusableText(
+                        TextString: _formatTimestamp(note['createdAt']),
+                        FontSize: 16,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -2,9 +2,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:examcollectors/Models/examQuestionModel.dart';
+import 'package:examcollectors/Pages/ExamPage/Bloc/exam_bloc.dart';
 import 'package:examcollectors/Pages/ExamPage/Widget/help_exam_page.dart';
+import 'package:examcollectors/auth/authetication.dart';
 import 'package:examcollectors/auth/examFetching.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../utils/AppColorCollections.dart';
@@ -101,24 +104,27 @@ class _exam_pageState extends State<exam_page> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: ColorCollections.PageColor,
+        backgroundColor: ColorCollections.TextColor,
         title: Center(
           child: Column(
             children: [
               ReusableText(
+                FromTop: 20,
                 FromLeft: 0,
                 TextString: 'UniExam Portal',
                 FontSize: 23,
                 FromBottom: 0,
-                TextColor: ColorCollections.TextColor,
+                TextColor: ColorCollections.WhiteColor,
                 TextFontWeight: FontWeight.bold,
               ),
               ReusableText(
+                FromBottom: 20,
                 FromLeft: 0,
+                FromTop: 0,
                 TextString: 'Access your university exams',
                 FontSize: 18,
-                TextColor: ColorCollections.TextColor.withOpacity(0.5),
-                TextFontWeight: FontWeight.bold,
+                TextColor: ColorCollections.WhiteColor,
+                TextFontWeight: FontWeight.w600,
               ),
             ],
           ),
@@ -381,8 +387,16 @@ class _exam_pageState extends State<exam_page> {
                               numQuestion: examQuestions.length,
                               min: int.parse(examTime),
                               startExam: () {
-                                Navigator.of(context)
-                                    .pushNamed('/exam_started_page');
+                                //feed questions to bloc
+                                context.read<ExamBloc>().add(
+                                      ExamLoadedEvent(
+                                        questionList: examQuestions,
+                                        examTime: examTime,
+                                      ),
+                                    );
+                                Navigator.of(context).pushNamed(
+                                    '/exam_started_page',
+                                    arguments: [selectedCourse,examTime,examQuestions.length.toString()]);
                               },
                             );
                           })
@@ -393,15 +407,25 @@ class _exam_pageState extends State<exam_page> {
                             borderRadius: BorderRadius.circular(10),
                             color: ColorCollections.WhiteColor,
                           ),
-                          child: ReusableText(
-                            FromTop: 0,
-                            FromLeft: 10,
-                            FromBottom: 0,
-                            TextString:
-                                'There is no available exams on the selected fields.',
-                            FontSize: 16,
-                            TextFontWeight: FontWeight.w400,
-                            TextColor: ColorCollections.SecondaryColor,
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                "assets/icons/noData.png",
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.fill,
+                              ),
+                              ReusableText(
+                                FromTop: 5,
+                                FromLeft: 10,
+                                FromBottom: 0,
+                                TextString:
+                                    'There is no available exams on the selected fields.',
+                                FontSize: 16,
+                                TextFontWeight: FontWeight.w400,
+                                TextColor: ColorCollections.SecondaryColor.withOpacity(0.7),
+                              ),
+                            ],
                           ),
                         )
                 ],

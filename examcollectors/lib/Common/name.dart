@@ -17,6 +17,8 @@ class NamedRoutes {
 
   static const String HOME_PAGE = "/home_page";
 
+  static const String EXAM_PAGE = "/exam_page";
+
   static const String EXAM_STARTING_PAGE = "/exam_starting_page";
 
   static const String EXAM_STARTED_PAGE = "/exam_started_page";

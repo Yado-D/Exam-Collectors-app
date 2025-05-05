@@ -1,14 +1,18 @@
+import 'package:examcollectors/services/examProvider.dart';
 import 'package:examcollectors/utils/AppColorCollections.dart';
 import 'package:examcollectors/widgets/AllCommonWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 ExamBetweenShowDialogue({
   required BuildContext context,
-  // required String TitleText,
+  required List<String> arguments,
   // required VoidCallback cancelOnTap,
   // required VoidCallback confirmOnTap,
 }) {
+  final timerProvider = Provider.of<ExamTimerProvider>(context, listen: false);
   return showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return SimpleDialog(
@@ -17,6 +21,7 @@ ExamBetweenShowDialogue({
               children: [
                 InkWell(
                   onTap: () {
+                    timerProvider.resume;
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -42,6 +47,9 @@ ExamBetweenShowDialogue({
                 ),
                 InkWell(
                   onTap: () {
+                    timerProvider.resetTimer(); // Reset the timer
+                    timerProvider.startTimer(timerProvider.initialDuration ~/
+                        60); // Restart with original duration
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -53,7 +61,10 @@ ExamBetweenShowDialogue({
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.restart_alt_outlined,color: ColorCollections.WhiteColor,),
+                        Icon(
+                          Icons.restart_alt_outlined,
+                          color: ColorCollections.WhiteColor,
+                        ),
                         ReusableText(
                           FromTop: 0,
                           TextString: "Restart",
@@ -69,7 +80,13 @@ ExamBetweenShowDialogue({
             ),
             InkWell(
               onTap: () {
-                Navigator.pushNamed(context,'/result_page');
+                timerProvider.resume;
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/result_page',
+                  (predicate) => false,
+                  arguments: arguments,
+                );
               },
               child: Container(
                 width: double.maxFinite,

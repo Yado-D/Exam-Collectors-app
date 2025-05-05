@@ -382,69 +382,61 @@ class fetchingExams {
     }
   }
 
-//post note of user
-
-  Future<void> postNotes({
+// Post a note - creates/updates individual documents
+  Future<void> postNote({
     required String title,
     required String userEmail,
     required String userNote,
   }) async {
     try {
-      DateTime date = DateTime.now();
-      final result = await _firestore
-          .collection("Users")
-          .doc(userEmail)
-          .collection('UserNotes')
-          .doc('Notes')
-          .set(
-        {
-          'userNote': FieldValue.arrayUnion([userNote]),
-          'Title': FieldValue.arrayUnion([title]),
-          'Date': FieldValue.arrayUnion([date]),
-        },
-        SetOptions(
-            merge:
-                true), // Merge ensures existing fields are updated instead of overwriting
-      );
-      print('success');
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-// Delete a user note
-  Future<void> deleteNote({
-    required String userEmail,
-    required String userNote,
-  }) async {
-    try {
-      // Fetch the current notes list to get the corresponding date (if needed)
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await _firestore
-          .collection("Users")
-          .doc(userEmail)
-          .collection('UserNotes')
-          .doc('Notes')
-          .get();
-
-      if (!snapshot.exists || !snapshot.data()!.containsKey('userNote')) {
-        print('No notes found for this user.');
-        return;
-      }
-
-      // Remove the specified note
       await _firestore
           .collection("Users")
           .doc(userEmail)
           .collection('UserNotes')
-          .doc('Notes')
-          .update({
-        'userNote': FieldValue.arrayRemove([userNote]),
+          .doc() // Auto-generate ID
+          .set({
+        'title': title,
+        'content': userNote,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       });
+      print("posted");
+    } catch (e) {
+      print('Error posting note: $e');
+    }
+  }
 
-      print('Note deleted successfully.');
+// Delete a specific note
+  Future<void> deleteNote({
+    required String userEmail,
+    required String noteId, // Pass document ID instead of content
+  }) async {
+    try {
+      await _firestore
+          .collection("Users")
+          .doc(userEmail)
+          .collection('UserNotes')
+          .doc(noteId)
+          .delete();
     } catch (e) {
       print('Error deleting note: $e');
     }
+  }
+
+// Get all notes (properly ordered)
+  Future<List<Map<String, dynamic>>> getNotes(String userEmail) async {
+    final snapshot = await _firestore
+        .collection("Users")
+        .doc(userEmail)
+        .collection('UserNotes')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs.map((doc) =>
+    {
+      'id': doc.id,
+      ...doc.data(),
+    }).toList();
   }
 
 //fetch opportunity data
@@ -516,22 +508,25 @@ class fetchingExams {
 
 //get user notes
 
-  Future<Map<String, dynamic>> GetPostNotes({
+  Future<List<Map<String, dynamic>>> GetPostNotes({
     required String userEmail,
   }) async {
     try {
-      final result = await _firestore
+      final querySnapshot = await _firestore
           .collection("Users")
           .doc(userEmail)
           .collection('UserNotes')
-          .doc('Notes')
           .get();
 
-      print(result.data()!["userNote"]);
-      return result.data()!;
+      return querySnapshot.docs.map((doc) {
+        return {
+          'id': doc.id, // Include document ID
+          ...doc.data(), // Spread all document fields
+        };
+      }).toList();
     } catch (e) {
-      print(e.toString());
-      return {};
+      print('Error fetching notes: $e');
+      return []; // Return empty list instead of map
     }
   }
 
