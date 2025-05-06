@@ -69,7 +69,7 @@
 MIT License - See LICENSE
 
 👨‍💻 About the Developer
-<hr style="height:1px; border:none; color:#e1e4e8; background-color:#e1e4e8; margin: 20px 0;"><div align="center"> <img src="https://avatars.githubusercontent.com/u/YOUR_GITHUB_ID" alt="Yared Dereje" width="100" style="border-radius:50%"> </div>
+
 ExamCollectors was created by Yared Dereje, a passionate Flutter developer and former university student dedicated to making academic success accessible to all. This project combines technical excellence with firsthand understanding of student struggles.
 
 📬 Contact
