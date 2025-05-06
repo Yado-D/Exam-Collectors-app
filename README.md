@@ -1,88 +1,85 @@
+# 📚 ExamCollectors  
+*Your Ultimate Academic Companion*  
+
+<div align="center">
+  <img src="./examcollectors.png" alt="ExamCollectors Banner" width="80%">
+</div>
+
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-screenshots">Screenshots</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-usage">Usage</a> •
+  <a href="#-dependencies">Dependencies</a> •
+  <a href="#-license">License</a> •
+  <a href="#-about-the-developer">About</a>
+</p>
+
+**ExamCollectors** is a comprehensive Flutter app designed to empower university students throughout their academic journey. From accessing past exams to AI-powered study assistance, this all-in-one tool helps you study smarter, track grades, and connect with peers.
 
 ---
 
-# 🎓 ExamCollectors  
-*Your All-in-One University Survival Kit*  
+## ✨ Features  
 
-![App Showcase](./IMG_20241004_164214_461.jpg)  
-*(Replace with actual screenshots of your app)*  
+### 📂 **Exam Vault**  
+- 🗃️ Largest crowdsourced collection of past papers and quizzes  
+- 🔍 Search by course code, professor, or semester  
 
----
+### 📊 **Grade Predictor**  
+- 🎯 "What-if" GPA scenarios with real-time calculations  
+- 📈 Visual grade breakdowns by assignment type  
 
-## 🌟 **Project Vision**  
-**Problem:** University students struggle to find past exams, track grades, and stay organized.  
-**Solution:** A single Flutter app that combines:  
-- **📂 Exam Vault:** Crowdsourced past papers + quizzes  
-- **🧮 Grade Predictor:** "What-if" score scenarios  
-- **⏳ Smart Study Tools:** Pomodoro, note-taking, AI tutor  
-- **👥 Community Hub:** Course-specific study groups  
+### ⏳ **Study Toolkit**  
+- � Pomodoro timer with session analytics  
+- ✏️ Cornell note-taking templates  
+- 🃏 Flashcard generator  
 
-Built with **Flutter + Firebase** for seamless cross-platform performance.  
+### 🤖 **AI Study Buddy**  
+- 💡 Instant homework help (GPT-3.5 powered)  
+- ✍️ Essay feedback and concept explanations  
 
----
-
-## 🚀 **Key Features**  
-
-| Feature | Why Students Love It |  
-|---------|----------------------|  
-| **Exam Database** | Find past papers by course/professor with peer-reviewed solutions |  
-| **Grade Calculator** | "If I score 80% on the final, my GPA becomes..." instantly |  
-| **Pomodoro Pro** | Custom timer with session analytics |  
-| **AI Study Buddy** | Get explanations for tough questions (GPT-3.5 powered) |  
-| **Professor Finder** | Rate and discover tutors in your faculty |  
-
-*(Tip: Add GIFs/videos showcasing each feature in action)*  
+### 👥 **Campus Connect**  
+- 🎓 Course-specific study groups  
+- ⭐ Professor ratings and office hour tracking  
 
 ---
 
-## 🛠 **Tech Stack**  
+## 📱 Screenshots  
 
-```mermaid  
-pie  
-    title Tech Breakdown  
-    "Flutter UI" : 45  
-    "Firebase Backend" : 35  
-    "AI Integration" : 15  
-    "Other Packages" : 5  
-```  
-
-**Core Packages:**  
-- `firebase_core`: Auth + Firestore  
-- `provider`: State management  
-- `flutter_markdown`: Format study notes  
-- `shared_preferences`: Local caching  
-
----
-
-## ⚡ **Quick Setup**  
-
-### 1. **Clone & Install**  
-```bash  
-git clone https://github.com/Yado-D/ExamCollectors.git  
-cd ExamCollectors  
-flutter pub get  
-```  
-
-### 2. **Firebase Setup** *(3 minutes)*  
-1. Create a Firebase project  
-2. Add your app (Android/iOS) → Download config files  
-   - Android: `google-services.json` → `/android/app`  
-   - iOS: `GoogleService-Info.plist` → `/ios/Runner`  
-
-### 3. **Run!**  
-```bash  
-flutter run  
-```  
-
-> 💡 **Pro Tip:** Enable Firebase Auth (Email/Google) and Firestore before testing!  
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="./home.png" alt="Home" width="200"></td>
+      <td><img src="./exam.png" alt="Exam Browser" width="200"></td>
+      <td><img src="./calculator.png" alt="Grade Calculator" width="200"></td>
+      <td><img src="./study.png" alt="Pomodoro Study Method" width="200"></td>
+    </tr>
+    <tr align="center">
+      <td>Home</td>
+      <td>Exam Browser</td>
+      <td>Grade Calculator</td>
+      <td>Pomodoro Timer</td>
+    </tr>
+  </table>
+</div>
 
 ---
+
 📜 License
-MIT License - See LICENSE for details.
+MIT License - See LICENSE
 
-## 📈 **Why This Matters**  
-- **Freshmen:** Hit the ground running with past exams  
-- **Seniors:** Graduate with confidence using grade tracking  
-- **Everyone:** Study smarter with AI + community support  
+👨‍💻 About the Developer
+<hr style="height:1px; border:none; color:#e1e4e8; background-color:#e1e4e8; margin: 20px 0;"><div align="center"> <img src="https://avatars.githubusercontent.com/u/YOUR_GITHUB_ID" alt="Yared Dereje" width="100" style="border-radius:50%"> </div>
+ExamCollectors was created by Yared Dereje, a passionate Flutter developer and former university student dedicated to making academic success accessible to all. This project combines technical excellence with firsthand understanding of student struggles.
 
- 
+📬 Contact
+For support, collaborations, or feedback:
+
+✉️ Email: yareddereje780@gmail.com
+
+🐞 GitHub Issues: Open an issue
+
+💼 LinkedIn: Yared Dereje
+
+<div align="center"> <h3>Let's build the future of education together! 🚀</h3> </div> 
+   
