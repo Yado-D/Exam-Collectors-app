@@ -4,7 +4,7 @@
 # 🎓 ExamCollectors  
 *Your All-in-One University Survival Kit*  
 
-![App Showcase](https://via.placeholder.com/1200x600/4a6fa5/ffffff?text=Mockup:+ExamCollectors+in+Action)  
+![App Showcase](./IMG_20241004_164214_461.jpg)  
 *(Replace with actual screenshots of your app)*  
 
 ---
