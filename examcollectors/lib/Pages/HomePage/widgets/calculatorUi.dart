@@ -392,7 +392,10 @@ class _calculatorUiState extends State<calculatorUi> {
                             print(courseModel.toString());
 
                             setState(() {
-                              myCourses = allMyCourses;
+                              if (allMyCourses != null &&
+                                  allMyCourses.length != 0) {
+                                myCourses = allMyCourses;
+                              }
                               myCourses?.add(courseModel);
                             });
 
@@ -449,16 +452,28 @@ class _calculatorUiState extends State<calculatorUi> {
 // Helper function to create consistent dropdown items
   double CalculateGrade() {
     List<int> allCrHrs = [];
-    List<double> AllGrades = [];
-    if (allMyCourses == null) {
-      return 0;
+    List<double> allGrades = [];
+
+    // First try to use myCourses if available
+    if (myCourses != null && myCourses!.isNotEmpty) {
+      for (int i = 0; i < myCourses!.length; i++) {
+        allCrHrs.add(myCourses![i].crdHour);
+        allGrades.add(myCourses![i].grade);
+      }
     }
-    for (int i = 0; i < allMyCourses!.length; i++) {
-      allCrHrs.add(allMyCourses![i].crdHour);
-      AllGrades.add(allMyCourses![i].grade);
+    // Fall back to allMyCourses if myCourses is empty/null
+    else if (allMyCourses != null && allMyCourses!.isNotEmpty) {
+      for (int i = 0; i < allMyCourses!.length; i++) {
+        allCrHrs.add(allMyCourses![i].crdHour);
+        allGrades.add(allMyCourses![i].grade);
+      }
+    }
+    // If both are null/empty
+    else {
+      return 0.0;
     }
 
-    if (allCrHrs.length != AllGrades.length) {
+    if (allCrHrs.length != allGrades.length) {
       print("Error: Mismatched credit hours and grades count.");
       return 0.0;
     }
@@ -466,19 +481,16 @@ class _calculatorUiState extends State<calculatorUi> {
     double totalGradePoints = 0.0;
     int totalCreditHours = 0;
 
-    for (int i = 0; i < AllGrades.length; i++) {
-      double grade = AllGrades[i];
-      int creditHour = allCrHrs[i];
+    for (int i = 0; i < allGrades.length; i++) {
+      totalGradePoints += allGrades[i] * allCrHrs[i];
+      totalCreditHours += allCrHrs[i];
+    }
 
-      totalGradePoints += grade * creditHour;
-      totalCreditHours += creditHour;
+    if (totalCreditHours == 0) {
+      return 0.0;
     }
 
     double gpa = totalGradePoints / totalCreditHours;
-
-    if (totalGradePoints == 0 && totalCreditHours == 0) {
-      gpa = 0;
-    }
     print("Your GPA is: ${gpa.toStringAsFixed(2)}");
     return double.parse(gpa.toStringAsFixed(2));
   }

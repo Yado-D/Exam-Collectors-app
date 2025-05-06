@@ -26,21 +26,31 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => ThemeManager()),
           ChangeNotifierProvider(create: (_) => PomodoroTimerService()),
           ChangeNotifierProvider(create: (_) => ExamTimerProvider()),
-
         ],
-        builder: (context,child){
-          return  ScreenUtilInit(
-            child: MaterialApp(
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                useMaterial3: true,
-              ),
-              debugShowCheckedModeBanner: false,
-              onGenerateRoute: NamedRouteSettings.GenerateRouteSettings,
-            ),
-          );
-        }
-
+        child: Builder(
+          builder: (context) {
+            return ScreenUtilInit(
+              designSize: const Size(360, 690), // Add your design size
+              minTextAdapt: true,
+              splitScreenMode: true,
+              builder: (context, child) {
+                return MaterialApp(
+                  theme: ThemeData(
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: Colors.deepPurple,
+                    ),
+                    useMaterial3: true,
+                  ),
+                  darkTheme: ThemeData.dark(), // Add dark theme if needed
+                  themeMode: context.watch<ThemeManager>().themeMode,
+                  debugShowCheckedModeBanner: false,
+                  onGenerateRoute: NamedRouteSettings.GenerateRouteSettings,
+                  initialRoute: '/', // Add initial route if needed
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

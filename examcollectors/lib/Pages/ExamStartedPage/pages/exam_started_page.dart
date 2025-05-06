@@ -21,26 +21,31 @@ class ExamStartedPage extends StatefulWidget {
   State<ExamStartedPage> createState() => _ExamStartedPageState();
 }
 
-int correctAnswer = 0;
-
 class _ExamStartedPageState extends State<ExamStartedPage> {
-  // Track selected options for each question
+  // Track selected options for each question (for multiple-choice)
   final Map<int, int?> _selectedOptions = {};
   bool _showResults = false;
   int _correctAnswers = 0;
+  int _shortAnswerCount = 0;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = (ModalRoute.of(context)!.settings.arguments as List).cast<String?>();
       final durationMinutes = int.tryParse(args[1] ?? '0') ?? 0;
-      print("Starting timer with $durationMinutes minutes"); // Debug
 
-      final timerProvider =
-          Provider.of<ExamTimerProvider>(context, listen: false);
+      // Count short-answer questions when initializing
+      if (BlocProvider.of<ExamBloc>(context).state is ExamLoadedState) {
+        final state = BlocProvider.of<ExamBloc>(context).state as ExamLoadedState;
+        _shortAnswerCount = state.questionsModelList.questionList
+            .where((q) => !q.isOption)
+            .length;
+      }
+
+      final timerProvider = Provider.of<ExamTimerProvider>(context, listen: false);
       timerProvider.startTimer(durationMinutes);
+      print("$_shortAnswerCount .......");
     });
   }
 
@@ -49,12 +54,12 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
     final args = ModalRoute.of(context)!.settings.arguments as List<String?>;
     final timerProvider = Provider.of<ExamTimerProvider>(context);
 
-    // Check if time is up
     if (timerProvider.isFinished && !_showResults) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showTimeUpDialog(context);
       });
     }
+
     return BlocConsumer<ExamBloc, ExamState>(
       listener: (context, state) {
         // TODO: implement listener
@@ -62,9 +67,9 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
       builder: (context, state) {
         if (state is ExamLoadedState) {
           final stateValue = state.questionsModelList;
-          final allQuestionsAnswered =
-              _selectedOptions.length == stateValue.questionList.length &&
-                  _selectedOptions.values.every((value) => value != null);
+
+          // Check if all questions are answered (only multiple-choice)
+          final allQuestionsAnswered = _areAllQuestionsAnswered(stateValue.questionList);
 
           return Scaffold(
             backgroundColor: ColorCollections.PageColor,
@@ -92,8 +97,11 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
                       InkWell(
                         onTap: () {
                           timerProvider.pauseTimer();
-                          ExamBetweenShowDialogue(context: context, arguments: [_correctAnswers.toString(),args[2]!,timerProvider.elapsedSeconds.toString()]);
-
+                          ExamBetweenShowDialogue(context: context, arguments: [
+                            _correctAnswers.toString(),
+                            args[2]!,
+                            timerProvider.elapsedSeconds.toString()
+                          ]);
                         },
                         child: ReusableText(
                           TextString: 'Stop',
@@ -129,22 +137,19 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: stateValue.questionList.length,
                                 itemBuilder: (context, index) {
-                                  final question =
-                                      stateValue.questionList[index];
-                                  return SingleQuestionReusableContainer(
+                                  final question = stateValue.questionList[index];
+                                  return QuestionWidget(
                                     question: question,
                                     questionIndex: index,
-                                    selectedOptionIndex:
-                                        _selectedOptions[index],
+                                    selectedOptionIndex: _selectedOptions[index],
                                     onOptionSelected: (selectedIndex) {
                                       setState(() {
                                         _selectedOptions[index] = selectedIndex;
-                                        // Check if all questions are answered
-                                        if (_selectedOptions.length ==
-                                                stateValue
-                                                    .questionList.length &&
-                                            _selectedOptions.values.every(
-                                                (value) => value != null)) {
+                                        if (question.isOption &&
+                                            question.options[selectedIndex].isCorrect) {
+                                          _correctAnswers++;
+                                        }
+                                        if (_areAllQuestionsAnswered(stateValue.questionList)) {
                                           _showResults = true;
                                         }
                                       });
@@ -164,9 +169,13 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
             ),
             floatingActionButton: InkWell(
               onTap: () {
+                print("short answer number is : $_shortAnswerCount");
                 Navigator.pushNamedAndRemoveUntil(
-                    context, '/result_page', (predicate) => false,
-                    arguments: [_correctAnswers.toString(),args[2],timerProvider.elapsedSeconds.toString()]);
+                    context, '/result_page', (predicate) => false, arguments: [
+                  (_correctAnswers+_shortAnswerCount).toString(),
+                  args[2],
+                  timerProvider.elapsedSeconds.toString()
+                ]);
               },
               child: Container(
                 height: 50,
@@ -195,6 +204,16 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
     );
   }
 
+  bool _areAllQuestionsAnswered(List<QuestionModel> questions) {
+    // Only check multiple-choice questions
+    for (int i = 0; i < questions.length; i++) {
+      if (questions[i].isOption && _selectedOptions[i] == null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void _showTimeUpDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -208,7 +227,6 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
             onPressed: () {
               Navigator.pop(context);
               setState(() => _showResults = true);
-              // _navigateToResultPage();
             },
             child: const Text('Submit'),
           ),
@@ -222,14 +240,14 @@ class _ExamStartedPageState extends State<ExamStartedPage> {
   }
 }
 
-class SingleQuestionReusableContainer extends StatelessWidget {
+class QuestionWidget extends StatelessWidget {
   final QuestionModel question;
   final int questionIndex;
   final int? selectedOptionIndex;
   final Function(int) onOptionSelected;
   final bool showResults;
 
-  const SingleQuestionReusableContainer({
+  const QuestionWidget({
     super.key,
     required this.question,
     required this.questionIndex,
@@ -252,65 +270,74 @@ class SingleQuestionReusableContainer extends StatelessWidget {
             FontSize: 18,
             TextFontWeight: FontWeight.w500,
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: question.options.length,
-            itemBuilder: (context, index) {
-              final option = question.options[index];
-              final isSelected = selectedOptionIndex == index;
-              final isCorrect = option['isCorrect'] as bool;
-              final letter =
-                  String.fromCharCode(65 + index); // A, B, C, D, etc.
+          SizedBox(height: 10),
 
-              return QuizReusableChoiceContainer(
-                choiceContent: "$letter. ${option['value'] as String}",
-                isCorrect: isCorrect,
-                isSelected: isSelected,
-                onTap: () {
-                  final parentState = context.findAncestorStateOfType<_ExamStartedPageState>()!;
-                  final previousSelection = selectedOptionIndex;
-
-                  onOptionSelected(index);
-
-                  if (!showResults) {
-                    parentState.setState(() {
-                      // Remove count from previous selection if it was correct
-                      if (previousSelection != null &&
-                          question.options[previousSelection]['isCorrect'] as bool) {
-                        parentState._correctAnswers--;
-                      }
-
-                      // Add count if new selection is correct
-                      if (isCorrect) {
-                        parentState._correctAnswers++;
-                      }
-                    });
-                  }
-                },
-                showResults: showResults,
-              );
-            },
-          ),
-          if (selectedOptionIndex != null && showResults)
-            ExpansionTile(
-              title: ReusableText(
-                TextColor: ColorCollections.TextColor,
-                TextString: "Explanation",
-                FontSize: 18,
-              ),
-              children: [
-                ReusableText(
-                  FromLeft: 10,
-                  FromRight: 10,
-                  TextColor: ColorCollections.TextColor,
-                  TextString: question.explanations,
-                  FontSize: 16,
-                ),
-              ],
-            ),
+          if (question.isOption)
+          // Multiple choice question
+            ..._buildOptions(context)
+          else
+          // Short answer question - just show the explanation
+            _buildShortAnswerExplanation(),
         ],
       ),
+    );
+  }
+
+  List<Widget> _buildOptions(BuildContext context) {
+    return [
+      ...question.options.map((option) {
+        final index = question.options.indexOf(option);
+        final isSelected = selectedOptionIndex == index;
+        final letter = String.fromCharCode(65 + index); // A, B, C, D, etc.
+
+        return QuizReusableChoiceContainer(
+          choiceContent: "$letter. ${option.value}",
+          isCorrect: option.isCorrect,
+          isSelected: isSelected,
+          onTap: () => onOptionSelected(index),
+          showResults: showResults,
+        );
+      }),
+      if (selectedOptionIndex != null && showResults)
+        _buildExplanation(),
+    ];
+  }
+
+  Widget _buildShortAnswerExplanation() {
+    return ExpansionTile(
+      title: ReusableText(
+        TextColor: ColorCollections.TextColor,
+        TextString: "Explanation",
+        FontSize: 18,
+      ),
+      children: [
+        ReusableText(
+          FromLeft: 10,
+          FromRight: 10,
+          TextColor: ColorCollections.TextColor,
+          TextString: question.explanations,
+          FontSize: 16,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExplanation() {
+    return ExpansionTile(
+      title: ReusableText(
+        TextColor: ColorCollections.TextColor,
+        TextString: "Explanation",
+        FontSize: 18,
+      ),
+      children: [
+        ReusableText(
+          FromLeft: 10,
+          FromRight: 10,
+          TextColor: ColorCollections.TextColor,
+          TextString: question.explanations,
+          FontSize: 16,
+        ),
+      ],
     );
   }
 }

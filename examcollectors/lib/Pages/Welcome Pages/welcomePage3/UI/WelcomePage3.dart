@@ -82,7 +82,7 @@ class WelcomePage3 extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 5,
                       ),
                       InkWell(
                         onTap: () {
@@ -110,7 +110,7 @@ class WelcomePage3 extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 5,
                       ),
                       InkWell(
                         onTap: () {
@@ -140,7 +140,7 @@ class WelcomePage3 extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 5,
                       ),
                       InkWell(
                         onTap: () {
@@ -168,7 +168,7 @@ class WelcomePage3 extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 5,
                       ),
                       Center(
                         child: InkWell(
@@ -221,10 +221,7 @@ class WelcomePage3 extends StatelessWidget {
                 margin: EdgeInsets.only(),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  image: const DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/Images/ButtonColor.jpg'),
-                  ),
+                  color: ColorCollections.TextColor,
                 ),
                 child: Center(
                   child: Text(

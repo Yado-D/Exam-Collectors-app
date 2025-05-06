@@ -45,6 +45,7 @@ class _home_pageState extends State<home_page> {
   @override
   Widget build(BuildContext context) {
     // print("this is user data : " + '${userModel!.toJson()}');
+
     return Scaffold(
       drawer: Drawer(
         child: DrowerWidget(
@@ -52,7 +53,7 @@ class _home_pageState extends State<home_page> {
           context: context,
         ),
       ),
-      key: globalKey,
+      key: drawerGlobalKey,
       body: bottomNavBarPages(
         context: context,
       )[currentIndex],

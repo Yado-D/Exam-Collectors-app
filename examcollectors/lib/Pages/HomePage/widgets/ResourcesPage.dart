@@ -47,7 +47,7 @@ Widget resourcePage() {
           delegate: SliverChildBuilderDelegate(
                  childCount: snapData!.length ?? 0,
                 (BuildContext context, int index) {
-              final url = snapData[index]["link"] ?? ""; // Corrected URL
+              final url = snapData[index]["link"] ?? "";
               return InkWell(
                 onTap: () async{
                   _launchSocialMedia(url);

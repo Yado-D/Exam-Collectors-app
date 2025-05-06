@@ -3,7 +3,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:examcollectors/Pages/HomePage/blocs/homePageState.dart';
 import 'package:examcollectors/Pages/HomePage/some_utils/some_utils.dart';
@@ -35,7 +34,8 @@ String capitalize(String input) {
   return input[0].toUpperCase() + input.substring(1);
 }
 
-GlobalKey<ScaffoldState> globalKey = GlobalKey();
+final GlobalKey<ScaffoldState> drawerGlobalKey = GlobalKey<ScaffoldState>();
+
 Widget DrawerWidgets({
   required String iconText,
   required String ImageType,
@@ -98,7 +98,8 @@ Widget sliverButtonTabImage({required String SliverImage}) {
   );
 }
 
-Widget titleBar(BuildContext context, {required Map<String, dynamic>? alpha}) {
+Widget titleBar(BuildContext context,
+    {required Map<String, dynamic>? alpha, required VoidCallback onTap}) {
   print(alpha!['userImage']);
   return Container(
     // height: 100,
@@ -108,9 +109,7 @@ Widget titleBar(BuildContext context, {required Map<String, dynamic>? alpha}) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () {
-            globalKey.currentState!.openDrawer();
-          },
+          onTap: onTap,
           child: Container(
             margin: const EdgeInsets.only(top: 10),
             child: Image.asset('assets/icons/menu.png',
@@ -271,7 +270,7 @@ Widget DrowerWidget({
                 children: [
                   InkWell(
                     onTap: () {
-                      globalKey.currentState!.openDrawer();
+                      // globalKey.currentState!.openDrawer();
                     },
                     child: (alpha!['userImage'] != null &&
                             alpha['userImage'] != '')
@@ -466,6 +465,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   late List _carouselData;
   UserModels? UserData;
   int selectedTabBar = 0;
+
+
   @override
   void initState() {
     super.initState();
@@ -497,6 +498,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     String fullName = "${UserData!.userName}," ?? '';
     String firstName = fullName.split(' ')[0];
     String capitalizedFirstName = capitalize(firstName);
+
     return Scaffold(
       backgroundColor: Color(0xFFE7F6F2),
       appBar: AppBar(
@@ -505,6 +507,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         title: titleBar(
           context,
           alpha: UserData!.toMap() ?? {},
+          onTap: () {
+            drawerGlobalKey.currentState!.openDrawer();
+          },
         ),
       ),
       body: SafeArea(
@@ -522,7 +527,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             SliverToBoxAdapter(
                 child: Container(
               // height: 60,
-              padding: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               // margin: EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
                 // gradient: LinearGradient(
@@ -714,7 +719,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     );
   }
 
-  List<String> tabNames = ["Toolkit", "Popular", "Opportunity"];
+  List<String> tabNames = ["Toolkit", "Resource", "Opportunity"];
   // List<Widget> tabPages = [
   //   toolkitPage(context),
   //   resourcePage(),

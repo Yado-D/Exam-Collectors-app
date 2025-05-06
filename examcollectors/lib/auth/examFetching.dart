@@ -158,12 +158,8 @@ class fetchingExams {
 
   //fetch examTime
 
-  static Future<String> fetchExamTime(
-      String university,
-      String department,
-      String subject,
-      String year,
-      String examType) async {
+  static Future<String> fetchExamTime(String university, String department,
+      String subject, String year, String examType) async {
     try {
       DocumentSnapshot examTypeSnapshot = await FirebaseFirestore.instance
           .collection('Exams')
@@ -432,11 +428,12 @@ class fetchingExams {
         .orderBy('createdAt', descending: true)
         .get();
 
-    return snapshot.docs.map((doc) =>
-    {
-      'id': doc.id,
-      ...doc.data(),
-    }).toList();
+    return snapshot.docs
+        .map((doc) => {
+              'id': doc.id,
+              ...doc.data(),
+            })
+        .toList();
   }
 
 //fetch opportunity data
@@ -488,10 +485,10 @@ class fetchingExams {
         // Ensure 'opp' key exists and is a list
         if (data != null && data['res'] is List) {
           // Cast 'opp' to a list of maps
-          List<Map<String, dynamic>> opportunities =
+          List<Map<String, dynamic>> resources =
               List<Map<String, dynamic>>.from(data['res']);
-          print("Fetched opportunities: $opportunities");
-          return opportunities;
+          print("Fetched Resources: $resources");
+          return resources;
         } else {
           print("Key 'res' is missing or not a list.");
         }

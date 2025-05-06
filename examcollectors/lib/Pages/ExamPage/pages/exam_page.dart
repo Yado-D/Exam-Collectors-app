@@ -374,7 +374,7 @@ class _exam_pageState extends State<exam_page> {
                       ? ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: examQuestions.length,
+                          itemCount: 1,
                           itemBuilder: (context, index) {
                             print(examQuestions[index]);
                             QuestionModel questionModel =

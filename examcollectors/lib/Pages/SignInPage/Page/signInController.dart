@@ -90,7 +90,7 @@ class SigninController {
                 print("$alpha  thi is alpha#################3");
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   '/home_page',
-                  (Route<dynamic> route) => false,
+                  (route) => false,
                   arguments: alpha,
                 );
               } else {

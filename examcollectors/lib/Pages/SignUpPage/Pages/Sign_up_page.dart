@@ -187,16 +187,13 @@ class _SignUpPageState extends State<SignUpPage> {
                       signinProgressIndicator.SignInProgressIndicator = false;
                     },
                     child: Container(
-                      height: 40,
+                      height: 50,
                       // width: 150,
                       margin:
                           const EdgeInsets.only(left: 30, top: 100, right: 30),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        image: const DecorationImage(
-                          fit: BoxFit.fill,
-                          image: AssetImage('assets/Images/ButtonColor.jpg'),
-                        ),
+                        color: ColorCollections.TextColor,
                       ),
                       child: Center(
                         child: Text(
